@@ -12,7 +12,7 @@ const cron = require('node-cron')
 const User = require('../codoforum/models/user')
 const Badge = require('../codoforum/models/badge')
 
-mongoose.connect(config.database)
+mongoose.connect(process.env.database)
 mongoose.connection.on("connected",()=>{
     console.log('Database connected');
 })

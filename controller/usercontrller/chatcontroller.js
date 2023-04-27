@@ -8,9 +8,7 @@ const getChatRoom = (req, res, next) => {
         res.status(200).json({data:chatroom[0]?.messages});
     });
   }catch(err){
-    res.json({
-      error:'page not found'
-    })
+   res.status('500').json('internal server error')
   }
    
 }
@@ -29,9 +27,7 @@ res.status(200).json({
 })
 
   } catch (err) {
-   res.json({
-    error:'page not found'
-   })
+  res.status('500').json('internal server error')
   }
 }
 
