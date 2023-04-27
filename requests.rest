@@ -1,0 +1,37 @@
+GET http://localhost:3000 HTTP/1.1
+Content-Type: application/json
+
+###
+POST http://localhost:3000/signup HTTP/1.1
+Content-Type: application/json
+
+{
+    "username":"Sayeed",
+    "phone":8138846225,
+    "email":"sayeedmon12@gmail.com",
+    "password":"12345"
+
+}
+
+###
+POST http://localhost:3000/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "email":"sayeedmon12@gmail.com",
+    "password":"12345"
+}
+
+###
+POST http://localhost:3000/token HTTP/1.1
+Content-Type: application/json
+
+{
+    "email":"sayeedmon12@gmail.com",
+    "username":"Sayeed",
+    "refreshToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNheWVlZG1vbjEyQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiU2F5ZWVkIiwiaWF0IjoxNjc4NTA5NjkwLCJleHAiOjE2Nzg1OTYwOTB9.s-Hms95imwbODLmmR3_DaU5CT8Ii_zbFxRstumndiAU"
+}
+
+###
+GET http://localhost:3000/admin/userlist HTTP/1.1
+Content-Type: application/json
