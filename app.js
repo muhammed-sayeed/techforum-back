@@ -9,8 +9,8 @@ const path = require('path')
 const socketIO = require('socket.io')
 const chatRoom = require('./models/chat')
 const cron = require('node-cron')
-const User = require('../codoforum/models/user')
-const Badge = require('../codoforum/models/badge')
+const User = require('./models/user')
+const Badge = require('./models/badge')
 
 mongoose.connect(process.env.database)
 mongoose.connection.on("connected",()=>{
