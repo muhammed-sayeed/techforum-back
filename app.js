@@ -26,7 +26,7 @@ app.use(bodyparser.urlencoded({extended:true}))
 
 //cors
 const corsOptions = {
-    origin: "http://web.codforum.site",
+    origin: "http://www.codforum.site",
     methods: "GET, POST,PUT,DELETE,PATCH",
     allowedHeaders: "Content-Type, Authorization",
     optionsSuccessStatus: 200, 
@@ -132,7 +132,6 @@ socket.on('typing', (data) => {
 
  // Set up a cron job to run the badge allocation function every day at midnight
  cron.schedule('10 * * * *',()=>{
-  console.log('crooon');
   const users = User.find();
   for(const user of users){
     for(const badge of Object.keys(badgeCriteria)){
