@@ -28,7 +28,7 @@ const addCommunity = async (req, res) => {
     const tags = req.body.tags
     const description = req.body.description
   
-    imgUrl = `http://localhost:3000/${data.path.substring(6)}`;
+    imgUrl = `https://codforum.site/${data.path.substring(6)}`;
   
     const community = new Community({
       name: name,
@@ -79,7 +79,7 @@ const updateImg = async (req, res) => {
     const Id = req.body.id;
     const data = req.file;
    console.log('kkkokoo',req.body);
-    imgUrl = `http://localhost:3000/${data.path.substring(6)}`;
+    imgUrl = `https://codforum.site/${data.path.substring(6)}`;
     await Tags.findOneAndUpdate({ _id: Id }, { $set: { image: imgUrl } });
   
     res.json({
