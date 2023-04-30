@@ -6,7 +6,7 @@ const addTag = async(req,res)=>{
       const name = req.body.name
       const description = req.body.description
     
-      const imgUrl = `https://codforum.site/${data.path.substring(6)}`
+      const imgUrl = `https://codforum.site/public/${data.path.substring(6)}`
      
     
       const tag = new Tag ({
