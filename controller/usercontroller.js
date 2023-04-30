@@ -213,7 +213,7 @@ const imgUpdate = async (req, res) => {
   const Id = req.body.id;
   const data = req.file;
 
-  imgUrl = `https://codforum.site/${data.path.substring(6)}`;
+  imgUrl = `https://codforum.onrender.com/${data.path.substring(6)}`;
   await user.findOneAndUpdate({ _id: Id }, { $set: { image: imgUrl } });
 
   res.json({
