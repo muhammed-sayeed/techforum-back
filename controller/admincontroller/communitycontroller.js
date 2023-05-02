@@ -22,17 +22,17 @@ const moderatorlist = async (req, res) => {
 
 const addCommunity = async (req, res) => {
   try{
-    // const data = req.file;
+     const data = req.file;
     const name = req.body.name;
     const members = req.body.members;
     const tags = req.body.tags
     const description = req.body.description
   
-    // imgUrl = `https://codforum.onrender.com/${data.path.substring(6)}`;
+     imgUrl = `https://codforum.onrender.com/${data.path.substring(6)}`;
   
     const community = new Community({
       name: name,
-      // image: imgUrl,
+       image: imgUrl,
       admins: JSON.parse(members),
       tags:JSON.parse(tags),
       description:description
