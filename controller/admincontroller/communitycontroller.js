@@ -15,7 +15,7 @@ const moderatorlist = async (req, res) => {
       tagList
     });
   }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
   }
  
 };
@@ -42,7 +42,7 @@ const addCommunity = async (req, res) => {
       success: true,
     });
   }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
   }
  
 };
@@ -55,7 +55,7 @@ const communityList = async (req, res) => {
         community,
       });
   }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
   }
 
 };
@@ -69,7 +69,7 @@ const removeCommunity = async (req, res) => {
       success: true,
     });
   }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
   }
  
 };
@@ -86,7 +86,7 @@ const updateImg = async (req, res) => {
       success: true,
     });
   }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
   }
 
 };
@@ -100,7 +100,7 @@ const removeMember = async (req, res) => {
       success: true,
     });
   }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
   }
  
 };

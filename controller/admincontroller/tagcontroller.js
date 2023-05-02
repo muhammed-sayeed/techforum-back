@@ -3,16 +3,16 @@ const Tag = require('../../models/tag')
 const addTag = async(req,res)=>{
      try{
       console.log(req.body);
-      // const data = req.file
+     
       const name = req.body.name
       const description = req.body.description
-      // const imgUrl = `https://codforum.onrender.com/${data.path.substring(6)}`
+     
      
     
       const tag = new Tag ({
        name:name,
        description:description,
-      //  image: imgUrl
+    
       })
      await tag.save()
     
@@ -33,7 +33,7 @@ const addTag = async(req,res)=>{
         tags
       })
     }catch(e){
-      res.status('500').json('internal server error')
+      res.status(500).json('internal server error')
     }
    
   }
@@ -50,7 +50,7 @@ const addTag = async(req,res)=>{
     success:true
   })
    }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
    }
    
   }
@@ -64,7 +64,7 @@ const addTag = async(req,res)=>{
       success:true
     })
    }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
    }
    
   }
@@ -78,7 +78,7 @@ const addTag = async(req,res)=>{
       res.status('200').json('name is available')
     }
   }catch(err){
-    res.status('500').json('internal servar error')
+    res.status(500).json('internal servar error')
   }
   }
 

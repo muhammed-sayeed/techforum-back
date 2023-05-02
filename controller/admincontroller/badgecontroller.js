@@ -14,7 +14,7 @@ const addBadge = async(req,res)=>{
             success:true
         })
     }catch(e){
-        res.status('500').json('internal server error')
+        res.status(500).json('internal server error')
     }
    
 }
@@ -40,7 +40,7 @@ const editBadge = async (req,res)=>{
            success:true
         })
     }catch(e){
-        res.status('500').json('internal server error')
+        res.status(500).json('internal server error')
     }
    
 }

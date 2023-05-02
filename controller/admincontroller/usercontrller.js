@@ -10,7 +10,7 @@ const userList = async (req, res) => {
       users,
     });
   }catch(e){
-    res.status('500').json('internal server error')
+    res.status(500).json('internal server error')
   }
    
   };
@@ -26,7 +26,7 @@ const userList = async (req, res) => {
         success: true,
       })
     }catch(e){
-      res.status('500').json('internal server error')
+      res.status(500).json('internal server error')
     }
    ;
   };
@@ -43,7 +43,7 @@ const userList = async (req, res) => {
         success:true
       })
     }catch(e){
-      res.status('500').json('internal server error')
+      res.status(500).json('internal server error')
     }
    
   }

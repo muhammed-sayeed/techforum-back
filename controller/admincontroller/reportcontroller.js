@@ -10,7 +10,7 @@ const reportedQns = async(req,res)=>{
             questions
         })
     }catch(e){
-        res.status('500').json('internal server error')
+        res.status(500).json('internal server error')
     }
    
 }
@@ -30,7 +30,7 @@ const singleReport = async(req,res)=>{
             comments
         })
     }catch(e){
-        res.status('500').json('internal server error')
+        res.status(500).json('internal server error')
     }
     
 }
@@ -44,7 +44,7 @@ const blockQuestion = async (req,res)=>{
             success:true
         })
     }catch(e){
-        res.status('500').json('internal server error')
+        res.status(500).json('internal server error')
     }
    
 }

@@ -101,7 +101,7 @@ const login = async (req, res) => {
         response,
       });
     }else{
-      res.status('403').json('incorrect password')
+      res.status(500).json('incorrect password')
     }
   } else if (uZer && uZer.access) {
     const User = {
@@ -133,10 +133,10 @@ const login = async (req, res) => {
         response,
       });
     }else{
-      res.status('403').json('incorrect password')
+      res.status(500).json('incorrect password')
     }
   } else {
-    res.status('422').json('Invailed Email')
+    res.status(500).json('Invailed Email')
   }
  }catch(err){
  
@@ -346,7 +346,7 @@ const tagQn = async (req,res)=>{
     qnlist
   })
  }catch(err){
- res.status('408').json('something went wrong')
+ res.status(500).json('something went wrong')
  }
 }
 
@@ -361,7 +361,7 @@ const tagBasedQn = async (req,res)=>{
     tagQn
   })
   }catch(err){
-   res.status('404').json('page not found')
+   res.status(500).json('page not found')
   }
 }
 
