@@ -19,7 +19,7 @@ const addTag = async(req,res)=>{
         success:true
     })
      }catch(e){
-      res.status('500').json('int server error')
+      res.status(500).json('int server error')
      }
     
   }
