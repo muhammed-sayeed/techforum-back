@@ -3,8 +3,8 @@ const Tag = require('../../models/tag')
 const addTag = async(req,res)=>{
      try{
       const data = req.file
-      const name = req.bodyname
-      const description = req.bodydescription
+      const name = req.body.name
+      const description = req.body.description
       const imgUrl = `https://codforum.onrender.com/${data.path.substring(6)}`
      
     
