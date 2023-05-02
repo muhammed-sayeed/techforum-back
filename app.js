@@ -39,10 +39,7 @@ const corsOptions = {
 const filestorage = multer.diskStorage({
   destination:(req,file,cb)=>{
     cb(null,"public/images")
-    },
-  filename: (req, file, cb) => {
-    cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname)
-  }
+    }
 })  
 
 const fileFilter =(req,file,cb) => {
