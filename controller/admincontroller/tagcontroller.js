@@ -2,6 +2,7 @@ const Tag = require('../../models/tag')
 
 const addTag = async(req,res)=>{
      try{
+      console.log(req.body);
       // const data = req.file
       const name = req.body.name
       const description = req.body.description
