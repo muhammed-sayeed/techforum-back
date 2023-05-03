@@ -36,7 +36,7 @@ const addComment = async (req,res)=>{
   const getComment = async(req,res)=>{
    try{
     const Id = req.query.Id
-    const comments = await Comment.find({question:Id}).populate('user')
+    const comments = await Comment.find({question:Id}).populate('user').sort({createAt:-1})
     res.json({
      comments
     })

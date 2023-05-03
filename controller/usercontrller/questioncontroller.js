@@ -91,7 +91,7 @@ const singleQn = async (req,res)=>{
 
 const getQuestions = async (req,res)=>{
  try{
-  const questions = await QN.find({state:'active'}).populate('user')
+  const questions = await QN.find({state:'active'}).populate('user').sort({createAt:-1})
   res.json({
     questions
   })
