@@ -43,8 +43,7 @@ const addQn = async (req, res) => {
 
  if(filter.isProfane(Content)){
   return res.status(200).json("Don't use false langaugue")
- }
-
+ }else{
   const qns = new QN({
     title: Content,
     titlehtml: cHtml,
@@ -56,6 +55,7 @@ const addQn = async (req, res) => {
 await user.findOneAndUpdate({_id:id},{$inc:{qncount:1}})
  
 res.status('200').json({success:true})
+ }
  }catch(err){
   res.status('500').json('something went wrong')
  }
