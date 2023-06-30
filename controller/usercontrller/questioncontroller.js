@@ -17,6 +17,7 @@ const addQn = async (req, res) => {
   const tags = req.body.tags
 
   let searchTextRegex =/(<pre\b[^>]>)([\s\S]?)(<\/pre>)/gi;
+  
   editor =  editor.replace(searchTextRegex,`<div class=" bg-gray-800 rounded-lg overflow-hidden mt-6">
   <div class="flex justify-between">
       <div id="header-buttons" class="py-3 px-4 flex">
@@ -41,9 +42,9 @@ const addQn = async (req, res) => {
   const Id = await user.findOne({email:email},{_id:1})
  const id = Id._id.toString()
 
- if(filter.isProfane(Content)){
-  return res.status(200).json("Don't use false langaugue")
- }else{
+//  if(filter.isProfane(Content)){
+//   return res.status(200).json("Don't use false langaugue")
+//  }else{
   const qns = new QN({
     title: Content,
     titlehtml: cHtml,
@@ -55,7 +56,7 @@ const addQn = async (req, res) => {
 await user.findOneAndUpdate({_id:id},{$inc:{qncount:1}})
  
 res.status('200').json({success:true})
- }
+// }
  }catch(err){
   res.status('500').json('something went wrong')
  }
