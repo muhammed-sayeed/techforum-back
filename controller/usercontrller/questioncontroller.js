@@ -70,7 +70,7 @@ const singleQn = async (req,res)=>{
 
     const ID = req.query.Id
     const qn = await QN.findOne({_id:ID}).populate('user').populate('tags')
-
+    console.log(qn);
     activity = ''
  qn.upvote.forEach((el)=>{
   if(el == id){
