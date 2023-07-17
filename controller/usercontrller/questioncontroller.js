@@ -55,10 +55,11 @@ const addQn = async (req, res) => {
   await qns.save();
 await user.findOneAndUpdate({_id:id},{$inc:{qncount:1}})
  
-res.status('200').json({success:true})
+res.status(200).json({success:true})
 // }
  }catch(err){
-  res.status('500').json('something went wrong')
+  console.log(err,'error')
+  res.status(500).json('something went wrong')
  }
 };
 
