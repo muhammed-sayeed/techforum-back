@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const{tokenCheck}=require('../middleware/authenticate')
 
 const {
     userList,
@@ -43,7 +44,7 @@ router.get('/userlist',tokenCheck,userList)
 router.post('/manageuser',tokenCheck,manageUser)
 router.post('/edituser',tokenCheck,ediUser)
 router.post('/addtag',tokenCheck,addTag)
-router.get('/taglist',tokenCheck.tagList)
+router.get('/taglist',tokenCheck,tagList)
 router.put('/edittag',tokenCheck,editTag)
 router.delete('/removetag',tokenCheck,removeTag)
 router.get('/moderatorlist',tokenCheck,moderatorlist)

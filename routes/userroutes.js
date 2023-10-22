@@ -15,8 +15,8 @@ const {
     searchUser,
     searchTags,
     tagBasedQn,
-    tagQn
- 
+    tagQn,
+    listOfTags
     
 
 } = require('../controller/usercontroller')
@@ -58,7 +58,8 @@ const {
     rejectArticle,
     addArtComment,
     singleArticle,
-    joinCommunity
+    joinCommunity,
+    communityList
 } = require('../controller/usercontrller/communitycontroller')
 
 
@@ -66,7 +67,7 @@ const {
 router.get('/',homeView)
 router.post('/signup',signup)
 router.post('/login',login)
-router.post('/token',token)
+router.post('/updatetoken',token)
 router.get('/userprofile',tokenCheck,userProfile)
 router.patch('/imgupdate',tokenCheck,imgUpdate)
 router.post('/updateprofile',tokenCheck,updateProfile)
@@ -77,7 +78,7 @@ router.get('/searchtags',searchTags)
 // router.get('/checkqn',searchQn)
 router.post('/addqn',tokenCheck,addQn)
 router.get('/tagqn',tokenCheck,tagForQn)
-router.get('/getqn',tokenCheck,getQuestions)
+router.get('/getqn',getQuestions)
 router.get('/singleqn',tokenCheck,singleQn)
 router.post('/saveans',tokenCheck,saveAnswer)
 router.get('/getanswer',tokenCheck,getAnswer)
@@ -100,6 +101,8 @@ router.post('/addartcomment',tokenCheck,addArtComment)
 router.get('/singleart',singleArticle)
 router.patch('/joincommunity',tokenCheck,joinCommunity)
 router.get('/tagbasedqn',tagBasedQn)
+router.get('/taglist',tokenCheck,listOfTags)
+router.get('/communitylist',tokenCheck,communityList)
 
 
 

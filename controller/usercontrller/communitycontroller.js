@@ -211,6 +211,17 @@ const joinCommunity = async(req,res)=>{
    }
 }
 
+const communityList = async (req, res) => {
+  try{
+    const community = await Community.find().populate('admins');
+      res.json({
+        community,
+      });
+  }catch(e){
+    res.status(500).json('internal server error')
+  }
+
+};
 
 
 
@@ -222,5 +233,6 @@ module.exports ={
     rejectArticle,
     addArtComment,
     singleArticle,
-    joinCommunity
+    joinCommunity,
+    communityList
 }

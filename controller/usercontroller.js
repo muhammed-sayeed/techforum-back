@@ -144,25 +144,34 @@ const login = async (req, res) => {
 };
 
 const token = (req, res) => {
-  const postData = req.body;
-  if (postData.refreshToken && postData.refreshToken in tokenList) {
+  const refresh = req.body.token;
+  console.log('updaaatioooon.....');
+  if (refresh) {
+  jwt.verify(refresh,process.env.refreshTokenSecret,(err,decoded)=>{
+    if(err){
+      res.status(403).json({"error":true,"msg":'unauthorized access'})
+    }
+    const mail = decoded.email
+    const username = decoded.username
     const user = {
-      email: postData.email,
-      username: postData.username,
-    };
-    const token = jwt.sign(user, config.tokenSecret, {
-      expiresIn: config.tokenLife,
-    });
-    const response = {
-      token: token,
-    };
-    tokenList[postData.refreshToken].token = token;
-    console.log(tokenList, "lliiiist");
-    res.status(200).json(response);
+      email:mail,
+      username:username
+    }
+  const newToken = jwt.sign(user,config.tokenSecret,{
+    expiresIn:config.tokenLife
+  })
+  res.status(200).json({
+    success:true,
+    token:newToken
+  })
+  })
+ 
   } else {
-    res.status(404).send("Invaild Request");
+    res.status(404).send("Invalid Request or Refresh Token");
   }
 };
+
+
 
 const userProfile = async (req, res) => {
   try{
@@ -365,7 +374,17 @@ const tagBasedQn = async (req,res)=>{
   }
 }
 
-
+const listOfTags = async(req,res)=>{
+  try{
+    const tags = await Tags.find()
+    res.json({
+      tags
+    })
+  }catch(e){
+    res.status(500).json('internal server error')
+  }
+ 
+}
 
 
 module.exports = {
@@ -381,5 +400,6 @@ module.exports = {
   searchUser,
   searchTags,
   tagBasedQn ,
-  tagQn
+  tagQn,
+  listOfTags
 };

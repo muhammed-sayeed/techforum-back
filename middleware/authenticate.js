@@ -7,6 +7,7 @@ module.exports.tokenCheck = (req,res,next)=>{
     if(token){
         jwt.verify(token,config.tokenSecret,function(err,decoded){
             if(err){
+                console.log(err);
                 return res.status(401).json({"error":true,"msg":'unauthorized access'})
      }
      res.locals.jwt_user = decoded;

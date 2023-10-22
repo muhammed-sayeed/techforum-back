@@ -26,7 +26,7 @@ app.use(bodyparser.urlencoded({extended:true}))
 
 //cors
 const corsOptions = {
-    origin: "https://codforum.site",
+    origin: ["https://codforum.site", "http://localhost:4200"],
     methods: "GET, POST,PUT,DELETE,PATCH",
     allowedHeaders: "Content-Type, Authorization",
     optionsSuccessStatus: 200, 
@@ -103,10 +103,7 @@ chatIo.on('connection',(socket)=>{
 });
 
 socket.on('message', (data) => {
-  console.log(data,'messagee');
-  // emitting the 'new message' event to the clients in that room
   io.in(data.room).emit('new message', {user: data.user, message: data.message});
-  // save the message in the 'messages' array of that chat-room
   chatRoom.updateOne({name: data.room}, { $push: { messages: { user: data.user, message: data.message } } }).then(()=>{
     console.log('message adeed')
   })
@@ -115,7 +112,6 @@ socket.on('message', (data) => {
 });
 
 socket.on('typing', (data) => {
-  // Broadcasting to all the users except the one typing 
   socket.broadcast.in(data.room).emit('typing', {data: data, isTyping: true});
 });
 
