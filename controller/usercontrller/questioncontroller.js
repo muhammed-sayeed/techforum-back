@@ -12,7 +12,7 @@ const Report = require('../../models/report')
 const addQn = async (req, res) => {
  try{
   const cHtml = req.body.CHtml;
-  const Content = req.body.Content;
+  // const Content = req.body.Content;
   let editor = req.body.editorContent;
   const tags = req.body.tags
 
@@ -46,7 +46,7 @@ const addQn = async (req, res) => {
 //   return res.status(200).json("Don't use false langaugue")
 //  }else{
   const qns = new QN({
-    title: Content,
+    // title: Content,
     titlehtml: cHtml,
     body: editor,
     user:id,
@@ -106,7 +106,7 @@ const singleQn = async (req,res)=>{
 
   const tagForQn = async(req,res)=>{
    try{
-    const tags = await Tags.find({},{name:1,_id:1})
+    const tags = await Tags.find({})
     res.json({
         tags
     })

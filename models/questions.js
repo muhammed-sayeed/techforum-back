@@ -3,9 +3,6 @@ const tag = require('./tag')
 const user = require('./user')
 
 const qnSchema = mongoose.Schema({
-    title:{
-        type:String
-    },
     titlehtml:{
         type:String
     },
