@@ -25,9 +25,10 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - name: Create .env file
+    
     - run: |
-       cat << 'EOF' > .env
-       ${{ secrets.PROD_ENV_FILE }}
-       EOF
+        cat << 'EOF' > .env
+        ${{ secrets.PROD_ENV_FILE }}
+        EOF
     # - run: npm run build --if-present
     # - run: npm test
