@@ -77,7 +77,9 @@ const userSchema = mongoose.Schema({
         type:Boolean,
         default:true
     },
-    
+    updated:{
+        typt: Boolean
+    }
 
 
 

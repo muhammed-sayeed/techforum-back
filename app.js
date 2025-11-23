@@ -66,8 +66,13 @@ const userRouts = require('./routes/userroutes')
 
 
 
-app.use('/admin',adminRouts)
-app.use('/',userRouts)
+app.use('/admin',adminRouts);
+app.use('/',userRouts);
+app.use('/test', (req,res)=>{
+  res.json({
+    message: 'successfully working'
+  })
+})
 
 
 const server = app.listen(3000)
