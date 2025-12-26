@@ -32,7 +32,7 @@ const signup = async (req, res) => {
     const hashedpassword = await bcrypt.hash(password, 10);
     const User = new user({
       username: req.body.username,
-      phone: req.body.phone,
+      // phone: req.body.phone,
       email: req.body.email,
       password: hashedpassword,
     });
@@ -49,7 +49,7 @@ const signup = async (req, res) => {
     });
     let userdata = {
       username: req.body.username,
-      phone: req.body.phone,
+      // phone: req.body.phone,
       email: req.body.email,
       token: token,
       refreshtoken: refreshToken,
@@ -90,6 +90,7 @@ const login = async (req, res) => {
       const response = {
         username: uZer.username,
         email: uZer.email,
+        role: uZer.category,
         phone: uZer.phone,
         token: token,
         refreshtoken: refreshToken,
@@ -101,7 +102,11 @@ const login = async (req, res) => {
         response,
       });
     }else{
-      res.status(500).json('incorrect password')
+      res.status(400).json({
+        success: false,
+        message: "Incorrect password"
+      });
+
     }
   } else if (uZer && uZer.access) {
     const User = {
@@ -122,6 +127,7 @@ const login = async (req, res) => {
         Id: uZer._id,
         username: uZer.username,
         email: uZer.email,
+        role: uZer.category,
         phone: uZer.phone,
         token: token,
         refreshtoken: refreshToken,
@@ -133,42 +139,51 @@ const login = async (req, res) => {
         response,
       });
     }else{
-      res.status(500).json('incorrect password')
+      res.status(400).json({
+        success: false,
+        message: "Incorrect password"
+      });
     }
   } else {
-    res.status(500).json('Invailed Email')
+    res.status(400).json({
+        success: false,
+        message: "Invalid Email"
+      });
   }
  }catch(err){
- 
+      res.status(500).json({
+        success: false,
+        message: "Internal Server Error"
+      });
  }
 };
 
-const token = (req, res) => {
-  const refresh = req.body.token;
-  console.log('updaaatioooon.....');
-  if (refresh) {
-  jwt.verify(refresh,process.env.refreshTokenSecret,(err,decoded)=>{
-    if(err){
-      res.status(403).json({"error":true,"msg":'unauthorized access'})
-    }
-    const mail = decoded.email
-    const username = decoded.username
-    const user = {
-      email:mail,
-      username:username
-    }
-  const newToken = jwt.sign(user,config.tokenSecret,{
-    expiresIn:config.tokenLife
-  })
-  res.status(200).json({
-    success:true,
-    token:newToken
-  })
-  })
- 
-  } else {
-    res.status(404).send("Invalid Request or Refresh Token");
+const refreshAccessToken = (req, res) => {
+  const refreshToken = req.body.token;
+
+  if (!refreshToken) {
+    return res.status(400).json({ error: "Refresh token missing" });
   }
+
+  jwt.verify(refreshToken, config.refreshTokenSecret, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid or expired refresh token" });
+    }
+
+    const payload = {
+      email: decoded.email,
+      username: decoded.username
+    };
+
+    const newAccessToken = jwt.sign(payload, config.tokenSecret, {
+      expiresIn: config.tokenLife
+    });
+
+    res.json({
+      success: true,
+      token: newAccessToken
+    });
+  });
 };
 
 
@@ -331,7 +346,16 @@ const searchTags = async (req, res) => {
 
     console.log(skey);
     const regex = new RegExp("^" + skey + ".*", "i");
-    const alltags = await Tags.aggregate([{ $match: { name: regex } }]);
+    const alltags = await Tags.aggregate([
+  { $match: { name: regex } },
+  {
+    $project: {
+      _id: 1,
+      name: 1,
+      description: 1
+    }
+  }
+]);
     res.json({
       success: true,
       tagdetails: alltags,
@@ -350,7 +374,7 @@ const tagQn = async (req,res)=>{
  try{
   const Id = req.query.Id
   console.log(Id);
-  const qnlist = await Qn.find({tags:{$in:[Id]}}).populate('user')
+  const qnlist = await Qn.find({tags:{$in:[Id]}}).populate('user').sort({ceatedAt: -1})
   res.json({
     qnlist
   })
@@ -363,35 +387,105 @@ const tagBasedQn = async (req,res)=>{
   try{
     const Id = req.query.Id
   const tagDetails = await Tags.findOne({_id:Id})
-  const tagQn =  await Qn.find({tags:{$in:[Id]}}).populate('user')
+  const qnlist =  await Qn.find({tags:{$in:[Id]}}).populate('user').populate('tags')
 
   res.json({
     tagDetails,
-    tagQn
+    qnlist
   })
   }catch(err){
    res.status(500).json('page not found')
   }
 }
 
-const listOfTags = async(req,res)=>{
-  try{
-    const tags = await Tags.find()
-    res.json({
-      tags
-    })
-  }catch(e){
-    res.status(500).json('internal server error')
-  }
- 
-}
+const mongoose = require("mongoose");
 
+const listOfTags = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page || '1', 10);
+    const pageSize = parseInt(req.query.pageSize || '20', 10);
+    const search = req.query.search || '';
+    const sort = req.query.sort || 'popular';
+
+    const filter = {};
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' };
+    }
+
+    let sortObj = {};
+    if (sort === 'name') sortObj = { name: 1 };
+    else if (sort === 'new') sortObj = { createdAt: -1 };
+    else sortObj = { point: -1 };
+
+    const lastWeek = new Date();
+    lastWeek.setDate(lastWeek.getDate() - 7);
+
+    const tagsAgg = await Tags.aggregate([
+      { $match: filter },
+
+      // Convert each string tag inside questions.tags → ObjectId
+      {
+        $lookup: {
+          from: "questions",
+          let: { tagId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toString: "$$tagId" }, // compare as string
+                    "$tags"                   // your questions.tags are strings
+                  ]
+                }
+              }
+            }
+          ],
+          as: "questions"
+        }
+      },
+
+      {
+        $addFields: {
+          totalQuestions: { $size: "$questions" },
+          lastWeekQuestions: {
+            $size: {
+              $filter: {
+                input: "$questions",
+                as: "q",
+                cond: { $gte: ["$$q.createdAt", lastWeek] }
+              }
+            }
+          }
+        }
+      },
+
+      { $project: { questions: 0 } },
+
+      { $sort: sortObj },
+
+      { $skip: (page - 1) * pageSize },
+      { $limit: pageSize },
+    ]);
+
+    const total = await Tags.countDocuments(filter);
+
+    res.json({
+      tags: tagsAgg,
+      total,
+      page,
+      pageSize,
+    });
+
+  } catch (e) {
+    console.log(e);
+    res.status(500).json("internal server error");
+  }
+};
 
 module.exports = {
   homeView,
   signup,
   login,
-  token,
   userProfile,
   imgUpdate,
   updateProfile,
@@ -401,5 +495,6 @@ module.exports = {
   searchTags,
   tagBasedQn ,
   tagQn,
-  listOfTags
+  listOfTags,
+  refreshAccessToken
 };

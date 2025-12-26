@@ -3,6 +3,7 @@ const Tags = require('../../models/tag')
 const user = require('../../models/user')
 const Badge = require('../../models/badge')
 const Filter  =require('bad-words')
+const ANS = require('../../models/answer')
 const filter = new Filter()
 
 const { findOneAndUpdate } = require('../../models/user');
@@ -72,6 +73,7 @@ const singleQn = async (req,res)=>{
 
     const ID = req.query.Id
     const qn = await QN.findOne({_id:ID}).populate('user').populate('tags')
+    const answer = await ANS.find({question: ID}).populate('user').sort({createdAt: -1})
     console.log(qn);
     activity = ''
  qn.upvote.forEach((el)=>{
@@ -86,6 +88,7 @@ const singleQn = async (req,res)=>{
  })
     res.json({
         qn,
+        answer,
         activity
     })
   }catch(err){
@@ -117,19 +120,44 @@ const singleQn = async (req,res)=>{
    }
 }
 
-const getQuestions = async (req,res)=>{
- try{
-  const questions = await QN.find({state:'active'}).populate('user').sort({createAt:-1})
-  res.json({
-    questions
-  })
- }catch(err){
- res.json({
-  error:'page not found'
- })
- }
-}
+const getQuestions = async (req, res) => {
+  try {
+    const questions = await QN.find(
+      { state: "active" },
+      {
+        title: 1,
+        titlehtml: 1,
+        body: 1,
+        answer: 1,
+        tags:1,
+        createdAt: 1,
+        upvote: 1,
+        downvote: 1
+      }
+    )
+      .populate("user", "_id username") 
+      .populate("tags","_id name")
+      .sort({ createdAt: -1 });
 
+    // Add vote counts manually (optional)
+    const formatted = questions.map(q => ({
+      _id: q._id,
+      title: q.title,
+      titlehtml: q.titlehtml,
+      body: q.body,
+      answer: q.answer,
+      tags:q.tags,
+      upvoteCount: q.upvote?.length || 0,
+      downvoteCount: q.downvote?.length || 0,
+      createdAt: q.createdAt,
+      user: q.user
+    }));
+
+    res.json({ questions: formatted });
+  } catch (err) {
+    res.json({ error: "page not found" });
+  }
+};
 
 
 

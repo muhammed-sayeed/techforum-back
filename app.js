@@ -26,7 +26,7 @@ app.use(bodyparser.urlencoded({extended:true}))
 
 //cors
 const corsOptions = {
-    origin: ["https://codforum.site", "http://localhost:4200"],
+    origin: '*',
     methods: "GET, POST,PUT,DELETE,PATCH",
     allowedHeaders: "Content-Type, Authorization",
     optionsSuccessStatus: 200, 
@@ -80,6 +80,19 @@ const server = app.listen(3000)
 const io = socketIO(server,{cors:{
   origin:'*',
 }})
+
+app.use(cors({
+  origin: [
+    'https://cod-forum.netlify.app',
+    'http://localhost:4200'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+app.use(express.json());
+
 
 app.set('io',io)
 

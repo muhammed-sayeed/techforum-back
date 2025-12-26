@@ -6,7 +6,7 @@ const {
     homeView,
     signup,
     login,
-    token,
+    refreshAccessToken,
     userProfile,
     imgUpdate,
     updateProfile,
@@ -65,9 +65,9 @@ const {
 
 
 router.get('/',homeView)
-router.post('/signup',signup)
-router.post('/login',login)
-router.post('/updatetoken',token)
+router.post('/global/signup',signup)
+router.post('/global/login',login)
+router.post('/global/updatetoken',refreshAccessToken)
 router.get('/userprofile',tokenCheck,userProfile)
 router.patch('/imgupdate',tokenCheck,imgUpdate)
 router.post('/updateprofile',tokenCheck,updateProfile)
@@ -78,7 +78,7 @@ router.get('/searchtags',searchTags)
 // router.get('/checkqn',searchQn)
 router.post('/addqn',tokenCheck,addQn)
 router.get('/tagqn',tokenCheck,tagForQn)
-router.get('/getqn',getQuestions)
+router.get('/global/getqn',getQuestions)
 router.get('/singleqn',tokenCheck,singleQn)
 router.post('/saveans',tokenCheck,saveAnswer)
 router.get('/getanswer',tokenCheck,getAnswer)
