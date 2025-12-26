@@ -155,7 +155,7 @@ const getQuestions = async (req, res) => {
 
     res.json({ questions: formatted });
   } catch (err) {
-    res.json({ error: "page not found" });
+    res.json({ error: err });
   }
 };
 
