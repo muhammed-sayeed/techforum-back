@@ -389,9 +389,54 @@ const tagBasedQn = async (req,res)=>{
   const tagDetails = await Tags.findOne({_id:Id})
   const qnlist =  await Qn.find({tags:{$in:[Id]}}).populate('user').populate('tags')
 
+  const relatedTags = await Qn.aggregate([
+      {
+        $match: {
+          tags: Id
+        }
+      },
+      { $unwind: '$tags' },
+      {
+        $match: {
+          tags: { $ne: Id }
+        }
+      },
+      {
+        $addFields: {
+          tagObjectId: { $toObjectId: '$tags' }
+        }
+      },
+      {
+        $group: {
+          _id: '$tagObjectId',
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { count: -1 } },
+      { $limit: 8 },
+      {
+        $lookup: {
+          from: 'tags',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'tag'
+        }
+      },
+
+      { $unwind: '$tag' },
+      {
+        $project: {
+          _id: '$tag._id',
+          name: '$tag.name',
+          count: 1
+        }
+      }
+    ]);
+
   res.json({
     tagDetails,
-    qnlist
+    qnlist,
+    relatedTags
   })
   }catch(err){
    res.status(500).json('page not found')

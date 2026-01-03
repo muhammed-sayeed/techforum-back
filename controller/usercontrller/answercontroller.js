@@ -107,70 +107,137 @@ const getAnswer = async (req,res)=>{
    
 }
 
-const ansUpVote = async (req,res)=>{
-  try{
-    const id = req.body.Id
-    console.log(id);
-    const data = res.locals.jwt_user;
-    const email = data.email;
-    const Id = await user.findOne({email:email},{_id:1})
-    const ID = Id._id.toString()
-  
-    const voted = await ANS.findOne({_id:id,upvote:{$in:[ID]}})
-    if(voted){
-     
-      await ANS.findOneAndUpdate({_id: id}, {$pull: {upvote: ID}})
-      return res.json({
-        success:false
-      })
-     }else
-      
-      await ANS.findOneAndUpdate({_id: id}, {$addToSet: {upvote: ID}})
-      await ANS.findOneAndUpdate({_id:id},{$pull: {downvote : ID}})
-      return res.json({
-        success:true
-      })
-  }catch(err){
-    res.json({
-      error:'somthing went wrong'
-    })
-  }
-   
-     }
-  
-  
-  const ansDownVote = async (req,res)=>{
-    try{
-      const id = req.body.Id
-      const data = res.locals.jwt_user;
-      const email = data.email;
-      const Id = await user.findOne({email:email},{_id:1})
-      const ID = Id._id.toString()
-    
-      const voted = await QN.findOne({_id:id,downvote:{$in:[ID]}})
-      if(voted){
-       await ANS.findOneAndUpdate({_id: id}, {$pull: {downvote: ID}})
-       res.json({
-         success:true
-       })
-      }else{
-       await ANS.findOneAndUpdate({_id: id}, {$addToSet: {downvote: ID}})
-       await ANS.findOneAndUpdate({_id:id}, {$pull: {upvote: ID}})
-       res.json({
-         success:false
-       })
-      }
-    }catch(err){
-      res.json({
-        error:'somthing went wrong'
-      })
+const voteAnswer = async (req, res) => {
+  try {
+    const { answerId, vote } = req.body; 
+
+    const { email } = res.locals.jwt_user;
+
+    const userDoc = await user.findOne({ email }, { _id: 1 });
+    if (!userDoc) {
+      return res.status(401).json({ success: false });
     }
-   
+
+    const userId = userDoc._id;
+
+    const answer = await ANS.findById(answerId);
+    if (!answer) {
+      return res.status(404).json({ success: false });
+    }
+
+    const hasUpvoted = answer.upvote.some(
+      (id) => id.equals(userId)
+    );
+    const hasDownvoted = answer.downvote.some(
+      (id) => id.equals(userId)
+    );
+
+    // 🟢 UPVOTE
+    if (vote === 'up') {
+      if (hasUpvoted) {
+        answer.upvote.pull(userId);        // toggle off
+      } else {
+        answer.upvote.addToSet(userId);    // add upvote
+        answer.downvote.pull(userId);      // remove downvote
+      }
+    }
+
+    // 🔴 DOWNVOTE
+    if (vote === 'down') {
+      if (hasDownvoted) {
+        answer.downvote.pull(userId);      // toggle off
+      } else {
+        answer.downvote.addToSet(userId);  // add downvote
+        answer.upvote.pull(userId);        // remove upvote
+      }
+    }
+
+    await answer.save();
+
+    return res.json({
+      success: true,
+      voteStatus: {
+        upvoted: answer.upvote.some(id => id.equals(userId)),
+        downvoted: answer.downvote.some(id => id.equals(userId))
+      },
+      counts: {
+        upvotes: answer.upvote.length,
+        downvotes: answer.downvote.length
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
   }
+};
+
+
+// const ansUpVote = async (req,res)=>{
+//   try{
+//     const id = req.body.Id
+//     console.log(id);
+//     const data = res.locals.jwt_user;
+//     const email = data.email;
+//     const Id = await user.findOne({email:email},{_id:1})
+//     const ID = Id._id.toString()
+  
+//     const voted = await ANS.findOne({_id:id,upvote:{$in:[ID]}})
+//     if(voted){
+     
+//       await ANS.findOneAndUpdate({_id: id}, {$pull: {upvote: ID}})
+//       return res.json({
+//         success:false
+//       })
+//      }else
+      
+//       await ANS.findOneAndUpdate({_id: id}, {$addToSet: {upvote: ID}})
+//       await ANS.findOneAndUpdate({_id:id},{$pull: {downvote : ID}})
+//       return res.json({
+//         success:true
+//       })
+//   }catch(err){
+//     res.json({
+//       error:'somthing went wrong'
+//     })
+//   }
+   
+//      }
+  
+  
+//   const ansDownVote = async (req,res)=>{
+//     try{
+//       const id = req.body.Id
+//       const data = res.locals.jwt_user;
+//       const email = data.email;
+//       const Id = await user.findOne({email:email},{_id:1})
+//       const ID = Id._id.toString()
+    
+//       const voted = await QN.findOne({_id:id,downvote:{$in:[ID]}})
+//       if(voted){
+//        await ANS.findOneAndUpdate({_id: id}, {$pull: {downvote: ID}})
+//        res.json({
+//          success:true
+//        })
+//       }else{
+//        await ANS.findOneAndUpdate({_id: id}, {$addToSet: {downvote: ID}})
+//        await ANS.findOneAndUpdate({_id:id}, {$pull: {upvote: ID}})
+//        res.json({
+//          success:false
+//        })
+//       }
+//     }catch(err){
+//       res.json({
+//         error:'somthing went wrong'
+//       })
+//     }
+   
+//   }
 
   module.exports ={
     saveAnswer,
     getAnswer,
-    ansUpVote,
-    ansDownVote,
+    voteAnswer
+    // ansUpVote,
+    // ansDownVote,
   }

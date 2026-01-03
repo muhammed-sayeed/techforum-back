@@ -9,7 +9,7 @@ const communityDetails = async(req,res)=>{
   try{
 let userType
 let isMember
- const Id = req.query.id
+ const Id = req.query.Id
  const community = await Community.findOne({_id:Id}).populate('tags')
  const visibleArt = await Article.find({community:Id,state:'visible'}).populate('user').populate('tags')
  const inVisibleArt = await Article.find({community:Id,state:'invisible'}).populate('user')
@@ -47,7 +47,7 @@ const questions = await QNS.aggregate([
       }
 ])
 res.json({
-    community,
+     community,
     questions,
     userType,
     visibleArt,
@@ -185,7 +185,7 @@ const singleArticle =async (req,res)=>{
 
 const joinCommunity = async(req,res)=>{
    try{
-    const Id=req.body.Id
+    const Id = req.body.Id
     console.log(Id);
     const data = res.locals.jwt_user;
     const email = data.email;
@@ -212,16 +212,42 @@ const joinCommunity = async(req,res)=>{
 }
 
 const communityList = async (req, res) => {
-  try{
-    const community = await Community.find().populate('admins');
-      res.json({
-        community,
-      });
-  }catch(e){
-    res.status(500).json('internal server error')
-  }
+  try {
 
+    const { email } = res.locals.jwt_user;
+
+    const currentUser = await user.findOne(
+      { email },
+      { _id: 1 }
+    );
+
+    if (!currentUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const communities = await Community.find().lean();
+
+    const updatedCommunities = communities.map((c) => ({
+      ...c,
+      isMember: c.users.some(
+        (u) => u.toString() === currentUser._id.toString()
+      )
+    }));
+
+    res.json({
+      success: true,
+      data: updatedCommunities
+    });
+
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
 };
+
 
 
 

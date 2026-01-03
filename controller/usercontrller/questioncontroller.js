@@ -120,7 +120,7 @@ const singleQn = async (req,res)=>{
    }
 }
 
-const getQuestions = async (req, res) => {
+const getHomeData = async (req, res) => {
   try {
     const questions = await QN.find(
       { state: "active" },
@@ -139,7 +139,6 @@ const getQuestions = async (req, res) => {
       .populate("tags","_id name")
       .sort({ createdAt: -1 });
 
-    // Add vote counts manually (optional)
     const formatted = questions.map(q => ({
       _id: q._id,
       title: q.title,
@@ -153,71 +152,51 @@ const getQuestions = async (req, res) => {
       user: q.user
     }));
 
-    res.json({ questions: formatted });
+    const tags = await QN.aggregate([
+  { $unwind: '$tags' },
+  {
+    $addFields: {
+      tagObjectId: {
+        $toObjectId: '$tags'
+      }
+    }
+  },
+  {
+    $group: {
+      _id: '$tagObjectId',
+      count: { $sum: 1 }
+    }
+  },
+  { $sort: { count: -1 } },
+  { $limit: 10 },
+  {
+    $lookup: {
+      from: 'tags',
+      localField: '_id',
+      foreignField: '_id',
+      as: 'tag'
+    }
+  },
+  { $unwind: '$tag' },
+  {
+    $project: {
+      _id: '$tag._id',
+      name: '$tag.name',
+      image: '$tag.image',
+      point: '$tag.point',
+      count: 1
+    }
+  }
+]);
+
+    res.json({ 
+      questions: formatted,
+      topTags: tags
+     });
   } catch (err) {
     res.json({ error: err });
   }
 };
-
-
-
-const qnUpVoted = async (req,res)=>{
-  try{
-    const id = req.body.Id
-  const data = res.locals.jwt_user;
-  const email = data.email;
-  const Id = await user.findOne({email:email},{_id:1})
-  const ID = Id._id.toString()
-  console.log(ID);
- const voted = await QN.findOne({_id:id,upvote:{$in:[ID]}})
- if(voted){
-  await QN.findOneAndUpdate({_id: id}, {$pull: {upvote: ID}})
-  res.json({
-    success:false
-  })
- }else{
-  await QN.findOneAndUpdate({_id: id}, {$addToSet: {upvote: ID}})
-  await QN.findOneAndUpdate({_id:id},{$pull: {downvote : ID}})
-  res.json({
-    success:true
-  })
- }
-  }catch(err){
-    res.json({
-      error:'somthing went wrong'
-    })
-  }
-}
-
-const qnDownVoted = async (req,res)=>{
- try{
-  const id = req.body.Id
-  const data = res.locals.jwt_user;
-  const email = data.email;
-  const Id = await user.findOne({email:email},{_id:1})
-  const ID = Id._id.toString()
-
-  const voted = await QN.findOne({_id:id,downvote:{$in:[ID]}})
- if(voted){
-  await QN.findOneAndUpdate({_id: id}, {$pull: {downvote: ID}})
-  res.json({
-    success:true
-  })
- }else{
-  await QN.findOneAndUpdate({_id: id}, {$addToSet: {downvote: ID}})
-  await QN.findOneAndUpdate({_id:id}, {$pull: {upvote: ID}})
-  res.json({
-    success:false
-  })
- }
- }catch(err){
-  res.json({
-    error:'somthing went wrong'
-  })
-}
-}
-
-
 
 const addReport = async (req,res)=>{
 try{
@@ -247,21 +226,75 @@ try{
 
 }
 
+const voteQuestion = async (req, res) => {
+  try {
+    const { questionId, vote } = req.body;
 
+    const { email } = res.locals.jwt_user;
 
+    const userDoc = await user.findOne({ email }, { _id: 1 });
+    if (!userDoc) {
+      return res.status(401).json({ success: false });
+    }
 
+    const userId = userDoc._id;
 
+    const question = await QN.findById(questionId);
+    if (!question) {
+      return res.status(404).json({ success: false });
+    }
+
+    const hasUpvoted = question.upvote.some(
+      (id) => id.equals(userId)
+    );
+    const hasDownvoted = question.downvote.some(
+      (id) => id.equals(userId)
+    );
+
+    if (vote === 'up') {
+      if (hasUpvoted) {
+        question.upvote.pull(userId);
+      } else {
+        question.upvote.addToSet(userId);
+        question.downvote.pull(userId);
+      }
+    }
+
+    if (vote === 'down') {
+      if (hasDownvoted) {
+        question.downvote.pull(userId);
+      } else {
+        question.downvote.addToSet(userId);
+        question.upvote.pull(userId);
+      }
+    }
+
+    await question.save();
+
+    return res.json({
+      success: true,
+      voteStatus: {
+        upvoted: question.upvote.some(id => id.equals(userId)),
+        downvoted: question.downvote.some(id => id.equals(userId))
+      },
+      counts: {
+        upvotes: question.upvote.length,
+        downvotes: question.downvote.length
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
+  }
+};
 
   module.exports ={
     addQn,
     // searchQn,
     tagForQn,
-    getQuestions,
+    getHomeData,
     singleQn,
-   
-    qnUpVoted,
-    qnDownVoted,
-  
     addReport,
- 
+    voteQuestion,
 }

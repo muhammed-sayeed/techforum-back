@@ -25,10 +25,9 @@ const {
     addQn,
     // searchQn,
     tagForQn,
-    getQuestions,
+    getHomeData,
+    voteQuestion,
     singleQn,
-    qnUpVoted,
-    qnDownVoted,
     addReport,
   
 } = require('../controller/usercontrller/questioncontroller')
@@ -36,8 +35,7 @@ const {
 const {
     saveAnswer,
     getAnswer,
-    ansUpVote,
-    ansDownVote,
+    voteAnswer
 } = require('../controller/usercontrller/answercontroller')
 
 const {
@@ -78,14 +76,12 @@ router.get('/searchtags',searchTags)
 // router.get('/checkqn',searchQn)
 router.post('/addqn',tokenCheck,addQn)
 router.get('/tagqn',tokenCheck,tagForQn)
-router.get('/global/getqn',getQuestions)
+router.get('/global/gethome',getHomeData)
 router.get('/singleqn',tokenCheck,singleQn)
 router.post('/saveans',tokenCheck,saveAnswer)
 router.get('/getanswer',tokenCheck,getAnswer)
-router.patch('/qnupvoted',tokenCheck,qnUpVoted)
-router.patch('/qndownvoted',tokenCheck,qnDownVoted)
-router.patch('/ansup',tokenCheck,ansUpVote)
-router.patch('/ansdown',tokenCheck,ansDownVote)
+router.patch('/votequestion',tokenCheck, voteQuestion)
+router.patch('/voteanswer', tokenCheck, voteAnswer)
 router.post('/addcomment',tokenCheck,addComment)
 router.get('/getcomment',tokenCheck,getComment)
 router.post('/addreport',tokenCheck,addReport)
